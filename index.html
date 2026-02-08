@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Quasar News</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: #000;
+            overscroll-behavior: none;
+        }
+
+        body {
+            height: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background-color: #000;
+            overscroll-behavior: none;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3vh 6vw;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 360px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2.2vh;
+        }
+
+        .rubric-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.4vh 5vw;
+            background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.1), inset 0 0 8px rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .rubric-item:active {
+            transform: scale(0.98);
+            border-color: #ffffff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .rubric-name {
+            font-size: clamp(10px, 3vw, 14px);
+            font-weight: 600;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+        }
+
+        .toggle-wrapper {
+            position: relative;
+            width: clamp(42px, 11vw, 50px);
+            height: clamp(22px, 5.5vw, 26px);
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .toggle-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, #5D0E1D 0%, #3a0812 100%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: calc(100% - 6px);
+            width: calc((100% - 8px) / 2);
+            left: 4px;
+            bottom: 3px;
+            background: linear-gradient(145deg, #ffffff 0%, #b0b0b0 100%);
+            transition: 0.3s ease;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .toggle-input:checked + .toggle-slider {
+            background: linear-gradient(145deg, #0F3D24 0%, #051F11 100%);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .toggle-input:checked + .toggle-slider:before {
+            transform: translateX(calc(100% + 2px));
+            background: linear-gradient(145deg, #ffffff 0%, #e0e0e0 100%);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .footer {
+            padding-top: 1.5vh;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .save-btn {
+            background: linear-gradient(145deg, #ffffff 0%, #d1d1d1 100%);
+            color: #000;
+            border: none;
+            padding: 1.8vh 10vw;
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .save-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="rubric-item" onclick="toggleRubric('recipes')">
+            <span class="rubric-name">РЕЦЕПТЫ ОТ THE GUARDIAN</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-recipes">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="rubric-item" onclick="toggleRubric('science')">
+            <span class="rubric-name">НАУКА И ТЕХНОЛОГИИ</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-science">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="rubric-item" onclick="toggleRubric('movies')">
+            <span class="rubric-name">КИНО И СЕРИАЛЫ</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-movies">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="rubric-item" onclick="toggleRubric('fashion')">
+            <span class="rubric-name">МОДА И КРАСОТА</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-fashion">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="rubric-item" onclick="toggleRubric('travel')">
+            <span class="rubric-name">ПУТЕШЕСТВИЯ</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-travel">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="rubric-item" onclick="toggleRubric('modern_love')">
+            <span class="rubric-name">MODERN LOVE</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-modern_love">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="rubric-item" onclick="toggleRubric('psychology')">
+            <span class="rubric-name">ПСИХОЛОГИЯ</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-psychology">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="rubric-item" onclick="toggleRubric('politics')">
+            <span class="rubric-name">ПОЛИТИКА</span>
+            <label class="toggle-wrapper" onclick="event.stopPropagation(); tg.HapticFeedback.impactOccurred('light');">
+                <input type="checkbox" class="toggle-input" id="toggle-politics">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="footer">
+            <button class="save-btn" onclick="saveSettings()">СОХРАНИТЬ</button>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        tg.isVerticalSwipesEnabled = false;
+
+        if (tg.requestFullscreen) {
+            try { tg.requestFullscreen(); } catch(e) {}
+        }
+
+        const rubrics = ['recipes', 'science', 'movies', 'fashion', 'travel', 'modern_love', 'psychology', 'politics'];
+
+        function loadSubscriptions() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subs = urlParams.get('subs');
+
+            if (subs) {
+                const activeRubrics = subs.split(',');
+                activeRubrics.forEach(rubric => {
+                    const toggle = document.getElementById(`toggle-${rubric}`);
+                    if (toggle) toggle.checked = true;
+                });
+            } else {
+                rubrics.forEach(rubric => {
+                    const toggle = document.getElementById(`toggle-${rubric}`);
+                    if (toggle) toggle.checked = true;
+                });
+            }
+        }
+
+        function toggleRubric(rubric) {
+            const toggle = document.getElementById(`toggle-${rubric}`);
+            toggle.checked = !toggle.checked;
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function saveSettings() {
+            tg.HapticFeedback.notificationOccurred('success');
+            const activeRubrics = rubrics.filter(r => document.getElementById(`toggle-${r}`).checked);
+            tg.sendData(JSON.stringify({
+                action: 'update_subscriptions',
+                subscriptions: activeRubrics
+            }));
+        }
+
+        loadSubscriptions();
+    </script>
+</body>
+</html>
